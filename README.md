@@ -1,2 +1,3 @@
 # go-playdb
-golang conver db tools
+
+golang 向 数据库进行转换的工具
