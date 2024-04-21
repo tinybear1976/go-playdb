@@ -31,3 +31,59 @@ func TestGenerateCreateTableSQL(t *testing.T) {
 		}
 	}
 }
+
+func TestGenerateCreateTableSQAllField(t *testing.T) {
+	type S1 struct {
+		Id   int
+		Name string
+		Age  int `json:"ageage"`
+	}
+	type S2 struct {
+		Id   string
+		Name string
+		Age  int
+	}
+	testCases := []any{
+		S1{},
+		S2{},
+	}
+
+	for _, tc := range testCases {
+		sql, err := GenerateCreateTableSQLAllField(tc)
+		typName := reflect.TypeOf(tc).Name()
+		if err != nil {
+			t.Logf("%s error: %v", typName, err)
+		} else {
+
+			t.Logf("%s, Generated SQL: %v", typName, sql)
+		}
+	}
+}
+
+func TestGenerateCreateTableSQLCustomTag(t *testing.T) {
+	type S1 struct {
+		Id   int
+		Name string `db:"username"`
+		Age  int    `json:"ageage"`
+	}
+	type S2 struct {
+		Id   int    `db:"userid"`
+		Name string `db:"username"`
+		Age  int
+	}
+	testCases := []any{
+		S1{},
+		S2{},
+	}
+
+	for _, tc := range testCases {
+		sql, err := GenerateCreateTableSQLCustomTag(tc, "db")
+		typName := reflect.TypeOf(tc).Name()
+		if err != nil {
+			t.Logf("%s error: %v", typName, err)
+		} else {
+
+			t.Logf("%s, Generated SQL: %v", typName, sql)
+		}
+	}
+}
