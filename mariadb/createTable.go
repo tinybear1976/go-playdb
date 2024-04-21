@@ -8,7 +8,7 @@ import (
 )
 
 // 根据自定义结构体中定义的生成CREATE TABLE语句
-func GenerateCreateTableSQL(data interface{}) (string, error) {
+func GenerateCreateTableSQL(data any) (string, error) {
 	typ := reflect.TypeOf(data)
 
 	if typ.Kind() != reflect.Struct {
