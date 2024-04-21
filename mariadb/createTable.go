@@ -96,5 +96,8 @@ func GenerateCreateTableSQLAllField(data any) (string, error) {
 
 // 根据自定义结构体,指定Tag属性名 生成CREATE TABLE语句。
 func GenerateCreateTableSQLCustomTag(data any, fieldTag string) (string, error) {
+	if fieldTag == "" || fieldTag == "*" {
+		return "", errors.New("fieldTag must not be empty")
+	}
 	return generateCreateTableSQL(data, fieldTag)
 }
