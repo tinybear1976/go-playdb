@@ -8,13 +8,19 @@ import (
 )
 
 // 根据自定义结构体中定义的生成CREATE TABLE语句
-func generateCreateTableSQL(data any, fieldCustomTag string) (string, error) {
+func generateCreateTableSQL(tableName string, data any, fieldCustomTag string) (string, error) {
 	typ := reflect.TypeOf(data)
 
 	if typ.Kind() != reflect.Struct {
 		return "", errors.New("data must be a struct")
 	}
-	tabName := typ.Name()
+	var tabName string
+	if tableName == "" {
+		tabName = typ.Name()
+	} else {
+		tabName = tableName
+	}
+
 	if LowercaseTableName {
 		tabName = strings.ToLower(tabName)
 	}
@@ -79,19 +85,20 @@ func generateCreateTableSQL(data any, fieldCustomTag string) (string, error) {
 	}
 
 	sql.WriteString("PRIMARY KEY (your_table_primary_key)\n")
-	sql.WriteString(");\n")
+	sql.WriteString(");")
+	sql.WriteByte('\n')
 
 	return sql.String(), nil
 }
 
 // 根据自定义结构体中定义的Tag默认值生成CREATE TABLE语句。tag=="axis" 或 tag=="axis_y"
 func GenerateCreateTableSQL(data any) (string, error) {
-	return generateCreateTableSQL(data, "")
+	return generateCreateTableSQL("", data, "")
 }
 
 // 根据自定义结构的所有字段生成CREATE TABLE语句。
 func GenerateCreateTableSQLAllField(data any) (string, error) {
-	return generateCreateTableSQL(data, "*")
+	return generateCreateTableSQL("", data, "*")
 }
 
 // 根据自定义结构体,指定Tag属性名 生成CREATE TABLE语句。
@@ -99,5 +106,23 @@ func GenerateCreateTableSQLCustomTag(data any, fieldTag string) (string, error) 
 	if fieldTag == "" || fieldTag == "*" {
 		return "", errors.New("fieldTag must not be empty")
 	}
-	return generateCreateTableSQL(data, fieldTag)
+	return generateCreateTableSQL("", data, fieldTag)
+}
+
+// 根据自定义结构体中定义的Tag默认值生成CREATE TABLE语句。tag=="axis" 或 tag=="axis_y"
+func GenerateCreateTableSQLNeedTabName(tableName string, data any) (string, error) {
+	return generateCreateTableSQL(tableName, data, "")
+}
+
+// 根据自定义结构的所有字段生成CREATE TABLE语句。
+func GenerateCreateTableSQLAllFieldNeedTabName(tableName string, data any) (string, error) {
+	return generateCreateTableSQL(tableName, data, "*")
+}
+
+// 根据自定义结构体,指定Tag属性名 生成CREATE TABLE语句。
+func GenerateCreateTableSQLCustomTagNeedTabName(tableName string, data any, fieldTag string) (string, error) {
+	if fieldTag == "" || fieldTag == "*" {
+		return "", errors.New("fieldTag must not be empty")
+	}
+	return generateCreateTableSQL(tableName, data, fieldTag)
 }

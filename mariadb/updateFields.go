@@ -7,13 +7,18 @@ import (
 	"strings"
 )
 
-func getUpdateFields(data any, fieldCustomTag string) (string, error) {
+func getUpdateFields(tableName string, data any, fieldCustomTag string) (string, error) {
 	typ := reflect.TypeOf(data)
 
 	if typ.Kind() != reflect.Struct {
 		return "", errors.New("data must be a struct")
 	}
-	tabName := typ.Name()
+	var tabName string
+	if tableName == "" {
+		tabName = typ.Name() // 获取结构体的名称作为表名
+	} else {
+		tabName = tableName
+	}
 	if LowercaseTableName {
 		tabName = strings.ToLower(tabName)
 	}
@@ -65,21 +70,45 @@ func getUpdateFields(data any, fieldCustomTag string) (string, error) {
 		}
 	}
 	sql.WriteString(strings.Join(fieldNames, ", "))
-
+	sql.WriteByte('\n')
 	return sql.String(), nil
 }
 
 func GetUpdateFields(data any) (string, error) {
-	return getUpdateFields(data, "")
+	return getUpdateFields("", data, "")
 }
 
 func GetUpdateAllField(data any) (string, error) {
-	return getUpdateFields(data, "*")
+	return getUpdateFields("", data, "*")
 }
 
 func GetUpdateFieldsFromCustomTag(data any, fieldTag string) (string, error) {
 	if fieldTag == "" || fieldTag == "*" {
 		return "", errors.New("fieldTag must not be empty")
 	}
-	return getUpdateFields(data, fieldTag)
+	return getUpdateFields("", data, fieldTag)
+}
+
+func GetUpdateFieldsNeedTabName(tableName string, data any) (string, error) {
+	if tableName == "" {
+		return "", errors.New("tableName must not be empty")
+	}
+	return getUpdateFields(tableName, data, "")
+}
+
+func GetUpdateAllFieldNeedTabName(tableName string, data any) (string, error) {
+	if tableName == "" {
+		return "", errors.New("tableName must not be empty")
+	}
+	return getUpdateFields(tableName, data, "*")
+}
+
+func GetUpdateFieldsFromCustomTagNeedTabName(tableName string, data any, fieldTag string) (string, error) {
+	if tableName == "" {
+		return "", errors.New("tableName must not be empty")
+	}
+	if fieldTag == "" || fieldTag == "*" {
+		return "", errors.New("fieldTag must not be empty")
+	}
+	return getUpdateFields(tableName, data, fieldTag)
 }

@@ -6,13 +6,19 @@ import (
 	"strings"
 )
 
-func getFields(data any, fieldCustomTag string) (string, error) {
+func getFields(tableName string, data any, fieldCustomTag string) (string, error) {
 	typ := reflect.TypeOf(data)
 
 	if typ.Kind() != reflect.Struct {
 		return "", errors.New("data must be a struct")
 	}
-	tabName := typ.Name()
+	var tabName string
+	if tableName == "" {
+		tabName = typ.Name()
+	} else {
+		tabName = tableName
+	}
+
 	if LowercaseTableName {
 		tabName = strings.ToLower(tabName)
 	}
@@ -66,21 +72,45 @@ func getFields(data any, fieldCustomTag string) (string, error) {
 	sql.WriteString(strings.Join(fieldNames, ", "))
 	sql.WriteString("\nFROM ")
 	sql.WriteString(tabName)
-
+	sql.WriteByte('\n')
 	return sql.String(), nil
 }
 
 func GetSelectFields(data any) (string, error) {
-	return getFields(data, "")
+	return getFields("", data, "")
 }
 
 func GetSelectAllField(data any) (string, error) {
-	return getFields(data, "*")
+	return getFields("", data, "*")
 }
 
 func GetSelectFieldsFromCustomTag(data any, fieldTag string) (string, error) {
 	if fieldTag == "" || fieldTag == "*" {
 		return "", errors.New("fieldTag must not be empty")
 	}
-	return getFields(data, fieldTag)
+	return getFields("", data, fieldTag)
+}
+
+func GetSelectFieldsNeedTabName(tableName string, data any) (string, error) {
+	if tableName == "" {
+		return "", errors.New("tableName must not be empty")
+	}
+	return getFields(tableName, data, "")
+}
+
+func GetSelectAllFieldNeedTabName(tableName string, data any) (string, error) {
+	if tableName == "" {
+		return "", errors.New("tableName must not be empty")
+	}
+	return getFields(tableName, data, "*")
+}
+
+func GetSelectFieldsFromCustomTagNeedTabName(tableName string, data any, fieldTag string) (string, error) {
+	if tableName == "" {
+		return "", errors.New("tableName must not be empty")
+	}
+	if fieldTag == "" || fieldTag == "*" {
+		return "", errors.New("fieldTag must not be empty")
+	}
+	return getFields("", data, fieldTag)
 }
