@@ -10,6 +10,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/shopspring/decimal"
 	"github.com/tinybear1976/go-playdb/mariadb"
 )
 
@@ -113,6 +114,9 @@ func reBuildStruct(sis []StructInfo) any {
 			f.Type = reflect.TypeOf(float64(0))
 		case "bool":
 			f.Type = reflect.TypeOf(bool(false))
+		case "&{decimal Decimal}":
+			f.Type = reflect.TypeOf(decimal.NewFromInt(0))
+			//	fmt.Println("//////", si.FieldType)
 		}
 		fields = append(fields, f)
 	}

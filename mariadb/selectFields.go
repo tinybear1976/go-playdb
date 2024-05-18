@@ -2,6 +2,7 @@ package mariadb
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -22,7 +23,7 @@ func getFields(tableName string, data any, fieldCustomTag string) (string, error
 	if LowercaseTableName {
 		tabName = strings.ToLower(tabName)
 	}
-
+	fmt.Println("select tableName:", tabName)
 	var sql strings.Builder
 	sql.WriteString("SELECT ")
 	fieldNames := []string{}
@@ -112,5 +113,5 @@ func GetSelectFieldsFromCustomTagNeedTabName(tableName string, data any, fieldTa
 	if fieldTag == "" || fieldTag == "*" {
 		return "", errors.New("fieldTag must not be empty")
 	}
-	return getFields("", data, fieldTag)
+	return getFields(tableName, data, fieldTag)
 }

@@ -80,6 +80,11 @@ func generateCreateTableSQL(tableName string, data any, fieldCustomTag string) (
 				sql.WriteString(fmt.Sprintf("%s INT NOT NULL,\n", fieldName))
 			case reflect.String:
 				sql.WriteString(fmt.Sprintf("%s VARCHAR(255) NOT NULL,\n", fieldName))
+			case reflect.Struct:
+				if fieldType.String() == decimalTypeName {
+					// decimal
+					sql.WriteString(fmt.Sprintf("%s VARCHAR(50) NOT NULL,\n", fieldName))
+				}
 			}
 		}
 	}

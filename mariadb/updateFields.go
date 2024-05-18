@@ -23,9 +23,12 @@ func getUpdateFields(tableName string, data any, fieldCustomTag string) (string,
 		tabName = strings.ToLower(tabName)
 	}
 
+	var ins strings.Builder
+	ins.WriteString("INSERT INTO " + tabName + " (")
 	var sql strings.Builder
 	sql.WriteString("UPDATE " + tabName + " SET ")
 	fieldNames := []string{}
+	fieldNamesOnly := []string{}
 	for i := 0; i < typ.NumField(); i++ {
 		var tag string
 		var fieldName string
@@ -66,12 +69,24 @@ func getUpdateFields(tableName string, data any, fieldCustomTag string) (string,
 		}
 
 		if tag != "" {
+			fieldNamesOnly = append(fieldNamesOnly, fieldName)
 			fieldNames = append(fieldNames, fmt.Sprintf("%s=?", fieldName))
 		}
 	}
+	ins.WriteString(strings.Join(fieldNamesOnly, ", "))
+	ins.WriteString(") VALUES (")
+	_insSplit := make([]string, len(fieldNamesOnly))
+	for i := 0; i < len(fieldNames); i++ {
+		_insSplit[i] = "?"
+	}
+	ins.Write([]byte(strings.Join(_insSplit, ", ")))
+	ins.WriteByte(')')
+	ins.WriteByte('\n')
+	ins.WriteByte('\n')
+
 	sql.WriteString(strings.Join(fieldNames, ", "))
 	sql.WriteByte('\n')
-	return sql.String(), nil
+	return ins.String() + sql.String(), nil
 }
 
 func GetUpdateFields(data any) (string, error) {
