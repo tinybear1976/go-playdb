@@ -146,6 +146,12 @@ func GenerateSQLFromFile(fileName string, tagMode string) error {
 		if err != nil {
 			return err
 		}
+		// fmt.Println(tagMode)
+		goCode, err := GoObjectReference(tbName, structInstance, tagMode)
+		if err != nil {
+			return err
+		}
+		writeSqlFile(sqlFilename, goCode)
 	}
 	return nil
 }
