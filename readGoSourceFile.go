@@ -125,6 +125,10 @@ func reBuildStruct(sis []StructInfo) any {
 	return structInstance.Interface()
 }
 
+// 依照go结构体文件生成sql文件.
+//
+//	fileName  为go结构体文件名
+//	tagMode   为结构体字段tag模式，默认为空,表示配合 标签"axis" 或 "axis_y"标签生成字段. *生成所有字段，其他为自定义tag
 func GenerateSQLFromFile(fileName string, tagMode string) error {
 	objs, err := GetStructs(fileName)
 	if err != nil {
